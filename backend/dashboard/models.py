@@ -5,7 +5,9 @@ from django.db import models
 class DataSource(models.Model):
     """Datasource model which keeps sources of campaign data."""
 
-    name = models.CharField(max_length=255, null=False, blank=False, unique=True)
+    name = models.CharField(
+        max_length=255, null=False, blank=False, unique=True, primary_key=True
+    )
 
 
 class Campaign(models.Model):
