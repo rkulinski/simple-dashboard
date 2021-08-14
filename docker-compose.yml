@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  dashboard-backend:
+    container_name: dashboard-backend
+    build:
+      context: .
+      dockerfile: config/backend.Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - dashboard-db
+    env_file:
+      - .env
+
+  dashboard-db:
+    container_name: dashboard-db
+    image: postgres:11.4-alpine
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+      POSTGRES_HOST: $DB_HOST
+      POSTGRES_PORT: $DB_PORT
+
+  dashboard-frontend:
+    container_name: dashboard-frontend
+    build:
+      context: .
+      dockerfile: config/frontend.Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - dashboard-backend
+    volumes:
+      - ./frontend/src/:/frontend/src
+      - ./frontend/public/:/frontend/public
+
+volumes:
+  db-data:
