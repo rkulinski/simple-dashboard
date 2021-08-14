@@ -13,8 +13,13 @@ interface SelectOption {
   label: string;
 }
 
+export interface FiltersType {
+  campaign: string;
+  dataSources: string[];
+}
+
 interface ControlPanelProps {
-  onFiltersApply(filters: { campaign: string; dataSources: string[] }): void;
+  onFiltersApply(filters: FiltersType): void;
   campaigns: SelectOption[];
   dataSourcesOptions: SelectOption[];
 }

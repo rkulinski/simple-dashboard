@@ -1,0 +1,10 @@
+{
+  "plugins": ["stylelint-order"],
+  "extends": "stylelint-config-sass-guidelines",
+  "rules": {
+    "indentation": 2,
+    "number-leading-zero": null,
+    "selector-class-pattern": "^[A-Z][a-zA-Z0-9]+(_[a-zA-Z0-9]+)*$",
+    "max-nesting-depth": 2
+  }
+}
