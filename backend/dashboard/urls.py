@@ -4,7 +4,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r"data_source", DataSourceViewSet)
+router.register(r"data-source", DataSourceViewSet)
 router.register(r"campaign", CampaignViewSet)
 
 urlpatterns = [

@@ -10,6 +10,13 @@ interface FetcherParams<QueryParams> {
   queryParams?: QueryParams;
 }
 
+interface BaseEndpointResponse<Item> {
+  count: number;
+  next?: string;
+  previous?: string;
+  results: Item[];
+}
+
 function mapQueryParamsToURL(
   queryParams: Record<string, string | number>
 ): string {
@@ -26,7 +33,7 @@ function mapQueryParamsToURL(
 
 export async function fetcher<Response, QueryParams>(
   params: FetcherParams<QueryParams>
-): Promise<Response> {
+): Promise<BaseEndpointResponse<Response>> {
   if (REACT_APP_BASE_API_URL.length === 0) {
     return Promise.reject('Invalid configuration.');
   }

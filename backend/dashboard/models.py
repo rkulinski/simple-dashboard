@@ -5,9 +5,10 @@ from django.db import models
 class DataSource(models.Model):
     """Datasource model which keeps sources of campaign data."""
 
-    name = models.CharField(
-        max_length=255, null=False, blank=False, unique=True, primary_key=True
-    )
+    name = models.CharField(max_length=255, null=False, blank=False, unique=True)
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Campaign(models.Model):
@@ -18,3 +19,6 @@ class Campaign(models.Model):
     data_source = models.ForeignKey(DataSource, on_delete=models.RESTRICT)
     clicks = models.IntegerField(default=0)
     impressions = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.name}"

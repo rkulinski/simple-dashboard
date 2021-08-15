@@ -5,7 +5,7 @@ from rest_framework import serializers
 class DataSourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataSource
-        fields = ["name"]
+        fields = ["id", "name"]
 
 
 class CampaignSerializer(serializers.ModelSerializer):
@@ -13,4 +13,4 @@ class CampaignSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Campaign
-        fields = ["name", "date", "clicks", "impressions", "data_source"]
+        fields = ["id", "name", "date", "clicks", "impressions", "data_source"]
