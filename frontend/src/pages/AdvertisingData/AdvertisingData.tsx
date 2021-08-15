@@ -14,21 +14,8 @@ const CAMPAIGNS_API_URL = 'dashboard/campaign';
 const DATASOURCE_API_URL = 'dashboard/data-source';
 
 interface DataFilter extends BasePaginationFilters {
-  name?: string;
-}
-
-function fetchCampaigns(queryParams: DataFilter) {
-  return fetcher<CampaignItemAPI, DataFilter>({
-    endpoint: CAMPAIGNS_API_URL,
-    queryParams,
-  });
-}
-
-function fetchDataSource(queryParams: DataFilter) {
-  return fetcher<DataSourceItemAPI, DataFilter>({
-    endpoint: DATASOURCE_API_URL,
-    queryParams,
-  });
+  campaign_ids?: string;
+  data_sources_ids?: string;
 }
 
 export const AdvertisingData = () => {
@@ -43,6 +30,8 @@ export const AdvertisingData = () => {
   useEffect(() => {
     const fetchData = async () => {
       const campaigns = await fetchAll(fetchCampaigns, 1000);
+      // TODO because campaigns are big set of data instead of loading that directly into
+      // memory it could be already transformed into chart data by chunks.
       const dataSource = await fetchAll(fetchDataSource);
       setDataSourcesOptions(dataSource.items.map(convertDataSourceToSelect));
       setCampaignDataOptions(campaigns.items.map(convertCampaignToSelect));
@@ -52,9 +41,20 @@ export const AdvertisingData = () => {
     fetchData();
   }, []);
 
-  const onFiltersApply = (filters: FiltersType) => {
-    console.log(filters);
-    // TODO request with filters
+  const onFiltersApply = async (filters: FiltersType) => {
+    // It would depend on business decision weather it is allowed to operate on
+    // already fetched data or with apply it should be refetched.
+    // For purpose of this task I decided to use BE filtering to make it more
+    // challenging.
+
+    const campaigns = await fetchAll((pagination) =>
+      fetchCampaigns({
+        ...pagination,
+        campaign_ids: filters.campaigns.join(','),
+        data_sources_ids: filters.dataSources.join(','),
+      })
+    );
+    setCampaignData(campaigns.items);
   };
 
   const chartData = useMemo(() => {
@@ -121,4 +121,18 @@ function convertCampaignToSelect(campaignItem: CampaignItemAPI): SelectOption {
     label: campaignItem.name,
     value: String(campaignItem.id),
   };
+}
+
+function fetchCampaigns(queryParams: DataFilter) {
+  return fetcher<CampaignItemAPI, DataFilter>({
+    endpoint: CAMPAIGNS_API_URL,
+    queryParams,
+  });
+}
+
+function fetchDataSource(queryParams: DataFilter) {
+  return fetcher<DataSourceItemAPI, DataFilter>({
+    endpoint: DATASOURCE_API_URL,
+    queryParams,
+  });
 }
