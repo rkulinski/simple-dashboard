@@ -8,8 +8,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import styles from './styles.module.scss';
-
 
 export interface DataChartItem extends Record<string, number | string> {
   name: string;
@@ -49,7 +47,12 @@ export const DataChart = (props: DataChartProps) => {
           stroke="#8884d8"
           activeDot={{ r: 8 }}
         />
-        <Line yAxisId="right" type="monotone" dataKey="clicks" stroke="#82ca9d" />
+        <Line
+          yAxisId="right"
+          type="monotone"
+          dataKey="clicks"
+          stroke="#82ca9d"
+        />
       </LineChart>
     </ResponsiveContainer>
   );

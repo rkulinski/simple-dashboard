@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import styles from './styles.module.scss';
 
-interface SelectOption {
+export interface SelectOption {
   value: string;
   label: string;
 }
 
 export interface FiltersType {
-  campaign: string;
+  campaigns: string[];
   dataSources: string[];
 }
 
@@ -26,20 +22,29 @@ interface ControlPanelProps {
 
 export const ControlPanel = (props: ControlPanelProps) => {
   const { onFiltersApply, campaigns, dataSourcesOptions } = props;
-  const [selectedCampaign, setSelectedCampaign] = useState<string>('');
+  const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
+  const [selectedDataSource, setSelectedDataSource] = useState<string[]>([]);
 
-  const onCampaignChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedCampaign(event.target.value as string);
+  const onCampaignChange = (
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    event: React.ChangeEvent<{}>,
+    values: SelectOption[]
+  ) => {
+    setSelectedCampaigns(values.map((campaign) => campaign.value));
+  };
+
+  const onDataSourceChange = (
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    event: React.ChangeEvent<{}>,
+    values: SelectOption[]
+  ) => {
+    setSelectedDataSource(values.map((dataSource) => dataSource.value));
   };
 
   const applyFilters = () => {
-    if (selectedCampaign === null) {
-      return;
-    }
-
     onFiltersApply({
-      campaign: selectedCampaign,
-      dataSources: [],
+      campaigns: selectedCampaigns,
+      dataSources: selectedDataSource,
     });
   };
 
@@ -52,36 +57,32 @@ export const ControlPanel = (props: ControlPanelProps) => {
         id="data-sources"
         options={dataSourcesOptions}
         getOptionLabel={(option: SelectOption) => option.label}
+        onChange={onDataSourceChange}
         renderInput={(params) => (
           <TextField
             {...params}
             variant="standard"
             label="Datasource"
-            placeholder="Select data sources"
+            placeholder="All"
           />
         )}
       />
-      <FormControl
-        className={
-          styles.ControlPanel_campaignFormControl +
-          ' ' +
-          styles.ControlPanel_formItem
-        }
-      >
-        <InputLabel id="campaign-select-label">Campaign</InputLabel>
-        <Select
-          labelId="campaign-select-label"
-          id="campaign-select"
-          value={selectedCampaign}
-          onChange={onCampaignChange}
-        >
-          {campaigns.map((campaignItem) => (
-            <MenuItem value={campaignItem.value} key={campaignItem.value}>
-              {campaignItem.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Autocomplete
+        className={styles.ControlPanel_formItem}
+        multiple
+        id="campaigns"
+        options={campaigns}
+        getOptionLabel={(option: SelectOption) => option.label}
+        onChange={onCampaignChange}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant="standard"
+            label="Campaigns"
+            placeholder="All"
+          />
+        )}
+      />
       <div className={styles.ControlPanel_formItem}>
         <Button onClick={applyFilters} variant="contained">
           Apply

@@ -61,7 +61,7 @@ export async function fetchAll<Item>(
   fetcher: (
     pagination: BasePaginationFilters
   ) => Promise<BaseEndpointResponse<Item>>,
-  pageSize = 100,
+  pageSize = 100
 ): Promise<{ count: number; items: Item[] }> {
   let next: string | undefined = '';
   let count = 0;

@@ -3,6 +3,7 @@ import Card from '@material-ui/core/Card';
 import {
   ControlPanel,
   FiltersType,
+  SelectOption,
 } from 'components/ControlPanel/ControlPanel';
 import { DataChart, DataChartItem } from 'components/DataChart/DataChart';
 import { BasePaginationFilters, fetchAll, fetcher } from 'fetcher';
@@ -32,21 +33,32 @@ function fetchDataSource(queryParams: DataFilter) {
 
 export const AdvertisingData = () => {
   const [campaignData, setCampaignData] = useState<CampaignItemAPI[]>([]);
+  const [campaignDataOptions, setCampaignDataOptions] = useState<
+    SelectOption[]
+  >([]);
+  const [dataSourcesOptions, setDataSourcesOptions] = useState<SelectOption[]>(
+    []
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       const campaigns = await fetchAll(fetchCampaigns, 1000);
       const dataSource = await fetchAll(fetchDataSource);
+      setDataSourcesOptions(dataSource.items.map(convertDataSourceToSelect));
+      setCampaignDataOptions(campaigns.items.map(convertCampaignToSelect));
       setCampaignData(campaigns.items);
     };
 
     fetchData();
   }, []);
 
-  const onFiltersApply = (filters: FiltersType) => {};
+  const onFiltersApply = (filters: FiltersType) => {
+    console.log(filters);
+    // TODO request with filters
+  };
 
   const chartData = useMemo(() => {
-    return convertDataSourceToChartData(campaignData);
+    return convertCampaignItemsToChartData(campaignData);
   }, [campaignData]);
 
   return (
@@ -54,8 +66,8 @@ export const AdvertisingData = () => {
       <div className={styles.AdvertisingData_panel}>
         <ControlPanel
           onFiltersApply={onFiltersApply}
-          campaigns={[]}
-          dataSourcesOptions={[]}
+          campaigns={campaignDataOptions}
+          dataSourcesOptions={dataSourcesOptions}
         />
       </div>
       <div className={styles.AdvertisingData_chart}>
@@ -65,8 +77,8 @@ export const AdvertisingData = () => {
   );
 };
 
-function convertDataSourceToChartData(
-  items: CampaignItemAPI[],
+function convertCampaignItemsToChartData(
+  items: CampaignItemAPI[]
 ): DataChartItem[] {
   const sum = items.reduce<
     Record<string, Pick<CampaignItemAPI, 'impressions' | 'clicks'>>
@@ -93,4 +105,20 @@ function convertDataSourceToChartData(
       ...entry[1],
     };
   });
+}
+
+function convertDataSourceToSelect(
+  dataSourceItem: DataSourceItemAPI
+): SelectOption {
+  return {
+    label: dataSourceItem.name,
+    value: String(dataSourceItem.id),
+  };
+}
+
+function convertCampaignToSelect(campaignItem: CampaignItemAPI): SelectOption {
+  return {
+    label: campaignItem.name,
+    value: String(campaignItem.id),
+  };
 }
