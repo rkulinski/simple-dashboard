@@ -1,13 +1,15 @@
 .AdvertisingData_container {
+  margin: 50px;
   display: flex;
 }
 
 .AdvertisingData_panel {
-  flex: 1;
+  border-right: solid 1px #c4c4c4;
+  width: 300px;
 }
 
 .AdvertisingData_chart {
-  flex: 5;
+  flex-grow: 1;
 }
 
 
