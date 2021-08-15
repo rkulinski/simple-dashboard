@@ -1,13 +1,13 @@
-export interface CampaignItemAPI {
+export interface DataSourceItemAPI {
   id: number;
   name: string;
 }
 
-export interface DataSourceItemAPI {
+export interface CampaignItemAPI {
   id: number;
   name: string;
   date: string;
-  data_source: CampaignItemAPI;
+  data_source: DataSourceItemAPI;
   clicks: number;
   impressions: number;
 }

@@ -55,15 +55,19 @@ export async function fetcher<Response, QueryParams>(
   return response.json();
 }
 
-const LOOP_LIMIT = 500;
+const LOOP_LIMIT = 5;
 
 export async function fetchAll<Item>(
-  fetcher: () => Promise<BaseEndpointResponse<Item>>
+  fetcher: (
+    pagination: BasePaginationFilters
+  ) => Promise<BaseEndpointResponse<Item>>,
+  pageSize = 100,
 ): Promise<{ count: number; items: Item[] }> {
   let next: string | undefined = '';
   let count = 0;
   let items: Item[] = [];
   let loopCounter = 0;
+  let nextPage = 0;
 
   while (next !== null) {
     loopCounter += 1;
@@ -71,13 +75,17 @@ export async function fetchAll<Item>(
       console.error('Could not fetch all data');
       break;
     }
-    const response = await fetcher();
+    const response = await fetcher({
+      limit: pageSize,
+      offset: nextPage * pageSize,
+    });
     count = response.count;
     if (count === 0) {
       break;
     }
 
     next = response.next;
+    nextPage += 1;
     items = [...items, ...response.results];
   }
 
