@@ -1,6 +1,6 @@
 .AdvertisingData_container {
-  margin: 50px;
   display: flex;
+  margin: 50px;
 }
 
 .AdvertisingData_panel {
@@ -10,6 +10,7 @@
 
 .AdvertisingData_chart {
   flex-grow: 1;
+  padding: 25px;
 }
 
 
