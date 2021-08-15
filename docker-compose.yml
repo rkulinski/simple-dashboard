@@ -42,6 +42,8 @@ services:
     volumes:
       - ./frontend/src/:/frontend/src
       - ./frontend/public/:/frontend/public
+    env_file:
+      - ./frontend/.env
 
 volumes:
   db-data:

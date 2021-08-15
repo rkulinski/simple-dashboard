@@ -26,7 +26,7 @@ interface ControlPanelProps {
 
 export const ControlPanel = (props: ControlPanelProps) => {
   const { onFiltersApply, campaigns, dataSourcesOptions } = props;
-  const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<string>('');
 
   const onCampaignChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedCampaign(event.target.value as string);
