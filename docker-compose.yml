@@ -1,6 +1,20 @@
 version: "3.9"
 
 services:
+  dashboard-db:
+    container_name: dashboard-db
+    image: postgres:11.4-alpine
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+      POSTGRES_HOST: $DB_HOST
+      POSTGRES_PORT: $DB_PORT
+
   dashboard-backend:
     container_name: dashboard-backend
     build:
@@ -15,20 +29,6 @@ services:
       - dashboard-db
     env_file:
       - .env
-
-  dashboard-db:
-    container_name: dashboard-db
-    image: postgres:11.4-alpine
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_DB: $DB_NAME
-      POSTGRES_USER: $DB_USER
-      POSTGRES_PASSWORD: $DB_PASS
-      POSTGRES_HOST: $DB_HOST
-      POSTGRES_PORT: $DB_PORT
 
   dashboard-frontend:
     container_name: dashboard-frontend
