@@ -1,3 +1,5 @@
+"""Load campaign data command."""
+
 import csv
 from collections import namedtuple
 from contextlib import closing
@@ -13,9 +15,18 @@ DataRow = namedtuple(
 
 
 class Command(BaseCommand):
+    """Load campaigns data command.
+    Usage:
+      python manage.py load_campaign_data [csv_url]
+
+    Where "csv_url" is accessible url for csv file.
+
+    File assumes structure of following:
+        Date,Datasource,Campaign,Clicks,Impressions
+    """
+
     # Improvements that could be done:
     # Move to some worker, e.g. celery
-    # Use stream
     help = "Load campaign data from CSV resource."
 
     def add_arguments(self, parser):
@@ -50,7 +61,7 @@ class Command(BaseCommand):
                         data_source=data_source,
                     )
                 )
-                if len(campaigns) > 100:
+                if len(campaigns) > 200:
                     Campaign.objects.bulk_update(
                         campaigns,
                         [

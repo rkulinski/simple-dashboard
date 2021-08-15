@@ -1,0 +1,15 @@
+{
+  "name": "frontent-linters",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "pre-commit": "^1.2.2",
+    "lint-staged": "^10.5.3"
+  },
+  "scripts": {
+    "lintfix": "cd frontend && lint-staged"
+  },
+  "pre-commit": [
+    "lintfix"
+  ]
+}
