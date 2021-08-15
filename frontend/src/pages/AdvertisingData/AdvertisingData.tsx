@@ -1,3 +1,4 @@
+import Card from '@material-ui/core/Card';
 import {
   ControlPanel,
   FiltersType,
@@ -11,7 +12,7 @@ export const AdvertisingData = () => {
   };
 
   return (
-    <div className={styles.AdvertisingData_container}>
+    <Card className={styles.AdvertisingData_container}>
       <div className={styles.AdvertisingData_panel}>
         <ControlPanel
           onFiltersApply={onFiltersApply}
@@ -22,6 +23,6 @@ export const AdvertisingData = () => {
       <div className={styles.AdvertisingData_chart}>
         <DataChart />
       </div>
-    </div>
+    </Card>
   );
 };

@@ -26,10 +26,10 @@ interface ControlPanelProps {
 
 export const ControlPanel = (props: ControlPanelProps) => {
   const { onFiltersApply, campaigns, dataSourcesOptions } = props;
-  const [selectedCampaign, setSelectedCampaign] = useState<number | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
 
-  const onCampaignChange = (event: React.ChangeEvent<{ value: string }>) => {
-    setSelectedCampaign(event.target.value);
+  const onCampaignChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedCampaign(event.target.value as string);
   };
 
   const applyFilters = () => {
@@ -47,6 +47,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
     <div className={styles.ControlPanel_container}>
       <h3>Filter dimension values</h3>
       <Autocomplete
+        className={styles.ControlPanel_formItem}
         multiple
         id="data-sources"
         options={dataSourcesOptions}
@@ -60,7 +61,13 @@ export const ControlPanel = (props: ControlPanelProps) => {
           />
         )}
       />
-      <FormControl>
+      <FormControl
+        className={
+          styles.ControlPanel_campaignFormControl +
+          ' ' +
+          styles.ControlPanel_formItem
+        }
+      >
         <InputLabel id="campaign-select-label">Campaign</InputLabel>
         <Select
           labelId="campaign-select-label"
@@ -75,7 +82,11 @@ export const ControlPanel = (props: ControlPanelProps) => {
           ))}
         </Select>
       </FormControl>
-      <Button onClick={applyFilters}>Apply</Button>
+      <div className={styles.ControlPanel_formItem}>
+        <Button onClick={applyFilters} variant="contained">
+          Apply
+        </Button>
+      </div>
     </div>
   );
 };
