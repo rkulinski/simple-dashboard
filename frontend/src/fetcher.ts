@@ -4,13 +4,18 @@ enum HTTPMethods {
   GET = 'GET',
 }
 
-interface FetcherParams<QueryParams> {
+export interface BasePaginationFilters {
+  limit?: number;
+  offset?: number;
+}
+
+interface FetcherParams<QueryParams extends BasePaginationFilters> {
   endpoint: string;
   method?: HTTPMethods;
   queryParams?: QueryParams;
 }
 
-interface BaseEndpointResponse<Item> {
+export interface BaseEndpointResponse<Item> {
   count: number;
   next?: string;
   previous?: string;
@@ -48,4 +53,36 @@ export async function fetcher<Response, QueryParams>(
   }
 
   return response.json();
+}
+
+const LOOP_LIMIT = 500;
+
+export async function fetchAll<Item>(
+  fetcher: () => Promise<BaseEndpointResponse<Item>>
+): Promise<{ count: number; items: Item[] }> {
+  let next: string | undefined = '';
+  let count = 0;
+  let items: Item[] = [];
+  let loopCounter = 0;
+
+  while (next !== null) {
+    loopCounter += 1;
+    if (loopCounter > LOOP_LIMIT) {
+      console.error('Could not fetch all data');
+      break;
+    }
+    const response = await fetcher();
+    count = response.count;
+    if (count === 0) {
+      break;
+    }
+
+    next = response.next;
+    items = [...items, ...response.results];
+  }
+
+  return {
+    count,
+    items,
+  };
 }

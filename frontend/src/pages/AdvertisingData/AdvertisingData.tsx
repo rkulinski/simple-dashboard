@@ -5,14 +5,14 @@ import {
   FiltersType,
 } from 'components/ControlPanel/ControlPanel';
 import { DataChart } from 'components/DataChart/DataChart';
-import { fetcher } from 'fetcher';
+import { BasePaginationFilters, fetchAll, fetcher } from 'fetcher';
 import { CampaignItemAPI, DataSourceItemAPI } from 'types/dashboardApi';
 import styles from './styles.module.scss';
 
 const CAMPAIGNS_API_URL = 'dashboard/campaign';
 const DATASOURCE_API_URL = 'dashboard/data-source';
 
-interface DataFilter {
+interface DataFilter extends BasePaginationFilters {
   name?: string;
 }
 
@@ -33,8 +33,8 @@ function fetchDataSource(queryParams: DataFilter) {
 export const AdvertisingData = () => {
   useEffect(() => {
     const fetchData = async () => {
-      const campaigns = await fetchCampaigns({});
-      const dataSource = await fetchDataSource({});
+      const campaigns = await fetchAll(() => fetchCampaigns({}));
+      const dataSource = await fetchAll(() => fetchDataSource({}));
       console.log(campaigns, dataSource);
     };
 
