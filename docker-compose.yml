@@ -5,15 +5,11 @@ services:
     container_name: dashboard-db
     image: postgres:11.4-alpine
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_DB: $DB_NAME
-      POSTGRES_USER: $DB_USER
-      POSTGRES_PASSWORD: $DB_PASS
-      POSTGRES_HOST: $DB_HOST
-      POSTGRES_PORT: $DB_PORT
+    env_file:
+      - .env
 
   dashboard-backend:
     container_name: dashboard-backend

@@ -39,7 +39,7 @@ export const DataChart = (props: DataChartProps) => {
         <YAxis yAxisId="right" orientation="right" />
         <Tooltip />
         <Legend />
-        {/* TODO we could extract dataKey from the keys of first object */}
+        {/* TODO it could be passed as configuration through props */}
         <Line
           yAxisId="left"
           type="monotone"

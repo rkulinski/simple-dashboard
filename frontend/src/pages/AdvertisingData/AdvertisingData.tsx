@@ -138,7 +138,12 @@ type CampaignAggregated = Record<
   Pick<CampaignItemAPI, 'impressions' | 'clicks' | 'date'>
 >;
 
-function aggregateCampaignItems(
+// Depending on usage those functions could get their own file.
+
+/** Get campaign items in aggregated form.
+ * Aggregate by date.
+ */
+export function aggregateCampaignItems(
   items: CampaignItemAPI[],
   initialValue: CampaignAggregated
 ): CampaignAggregated {
@@ -194,6 +199,8 @@ function fetchCampaigns(queryParams: DataFilter) {
   });
 }
 
+/** Get campaign items with name and id only.
+ */
 function fetchFlatCampaigns(
   queryParams: Pick<DataFilter, 'campaign_ids'> & { name: string }
 ) {
