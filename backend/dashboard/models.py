@@ -12,7 +12,9 @@ class DataSource(models.Model):
 
 
 class Campaign(models.Model):
-    """Campaign model."""
+    """Campaign model.
+    Campaign data. Stores available data about campaigns for given data source.
+    """
 
     name = models.CharField(max_length=255, null=False, blank=False)
     date = models.DateField(null=True)

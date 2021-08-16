@@ -5,13 +5,6 @@
   "dependencies": {
     "@material-ui/core": "^4.12.3",
     "@material-ui/lab": "^4.0.0-alpha.60",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "@types/jest": "^26.0.15",
-    "@types/node": "^12.0.0",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
     "node-sass": "^5.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -21,6 +14,13 @@
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^7.2.0",
     "eslint-config-stylelint": "^13.1.0",
@@ -38,7 +38,14 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lintfix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && stylelint '**/*.scss' --fix"
+    "lintfix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && stylelint '**/*.scss' --fix",
+    "linter": "eslint 'src/**/*.{js,jsx,ts,tsx}' && stylelint '**/*.scss'"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "*.scss": "stylelint --syntax=scss --fix"
   },
   "eslintConfig": {
     "extends": [

@@ -29,9 +29,9 @@ export const AdvertisingData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const campaigns = await fetchAll(fetchCampaigns, 1000);
       // TODO because campaigns are big set of data instead of loading that directly into
       // memory it could be already transformed into chart data by chunks.
+      const campaigns = await fetchAll(fetchCampaigns, 1000);
       const dataSource = await fetchAll(fetchDataSource);
       setDataSourcesOptions(dataSource.items.map(convertDataSourceToSelect));
       setCampaignDataOptions(campaigns.items.map(convertCampaignToSelect));
@@ -48,7 +48,7 @@ export const AdvertisingData = () => {
     // challenging.
 
     const campaigns = await fetchAll((pagination) =>
-      fetchCampaigns({
+      fetchCampaigns( {
         ...pagination,
         campaign_ids: filters.campaigns.join(','),
         data_sources_ids: filters.dataSources.join(','),

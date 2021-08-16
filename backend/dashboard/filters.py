@@ -5,6 +5,14 @@ class CampaignFilterBackend(filters.BaseFilterBackend):
     """Allow to filter by multiple ids."""
 
     def filter_queryset(self, request, queryset, view):
+        """Custom filter for campaigns.
+
+        Allow filtering by ids of campaigns themselves and/or related
+        data source ids.
+
+        Expected query params structure:
+            campaign_ids=1,2,3&data_sources_ids=2
+        """
         campaign_ids = request.query_params.get("campaign_ids") or ""
         data_sources_ids = request.query_params.get("data_sources_ids") or ""
 
