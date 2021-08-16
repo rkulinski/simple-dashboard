@@ -39,6 +39,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:nowatch": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
     "lintfix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && stylelint '**/*.scss' --fix",
     "linter": "eslint 'src/**/*.{js,jsx,ts,tsx}' && stylelint '**/*.scss'"

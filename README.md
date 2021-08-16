@@ -3,6 +3,9 @@
 ## Description
 Visualise campaigns data on chart.
 
+
+![Dashboard](./dashboard.png)
+
 #### Usage
 1. Go to main directory
 2. Copy `.env.template` into `.env` (you can leave values as default).
@@ -48,7 +51,7 @@ What could be improved:
 - Add more tests.
 - Add some backend caching.
 - Use some worker (e.g. celery) to load campaigns data.
-- Some styling and UX could be improved.
+- Some styling and UX could be improved. Especially for chart (aggregate by month for example).
 
 ## Commands
 
@@ -73,5 +76,5 @@ docker exec -t dashboard-backend python manage.py test
 ```
 Frontend:
 ```
-docker exec -t dashboard-frontend yarn test
+docker exec -t dashboard-frontend yarn test:nowatch
 ```
