@@ -10,8 +10,8 @@ export interface SelectOption {
 }
 
 export interface FiltersType {
-  campaigns: string[];
-  dataSources: string[];
+  campaigns?: string[];
+  dataSources?: string[];
 }
 
 interface ControlPanelProps {
@@ -19,11 +19,17 @@ interface ControlPanelProps {
   onCampaignSearch(query: string): void;
   campaigns: SelectOption[];
   dataSourcesOptions: SelectOption[];
+  disableApply?: boolean;
 }
 
 export const ControlPanel = (props: ControlPanelProps) => {
-  const { onFiltersApply, campaigns, dataSourcesOptions, onCampaignSearch } =
-    props;
+  const {
+    onFiltersApply,
+    campaigns,
+    dataSourcesOptions,
+    onCampaignSearch,
+    disableApply = false,
+  } = props;
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
   const [selectedDataSource, setSelectedDataSource] = useState<string[]>([]);
 
@@ -96,7 +102,11 @@ export const ControlPanel = (props: ControlPanelProps) => {
         )}
       />
       <div className={styles.ControlPanel_formItem}>
-        <Button onClick={applyFilters} variant="contained">
+        <Button
+          onClick={applyFilters}
+          variant="contained"
+          disabled={disableApply}
+        >
           Apply
         </Button>
       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '@material-ui/core/Card';
 import {
   ControlPanel,
@@ -6,7 +6,7 @@ import {
   SelectOption,
 } from 'components/ControlPanel/ControlPanel';
 import { DataChart, DataChartItem } from 'components/DataChart/DataChart';
-import { BasePaginationFilters, fetchAll, fetcher } from 'fetcher';
+import { BasePaginationFilters, fetcher } from 'fetcher';
 import { CampaignItemAPI, DataSourceItemAPI } from 'types/dashboardApi';
 import styles from './styles.module.scss';
 
@@ -19,7 +19,7 @@ interface DataFilter extends BasePaginationFilters {
 }
 
 export const AdvertisingData = () => {
-  const [campaignData, setCampaignData] = useState<CampaignItemAPI[]>([]);
+  const [chartData, setChartData] = useState<DataChartItem[]>([]);
   const [campaignDataOptions, setCampaignDataOptions] = useState<
     SelectOption[]
   >([]);
@@ -27,19 +27,70 @@ export const AdvertisingData = () => {
     []
   );
   const [campaignSearchTerm, setCampaignSearchTerm] = useState('');
+  const [campaignFilters, setCampaignFilters] = useState<DataFilter>({});
+  const [chardDataLoading, setChartDataLoading] = useState(false);
 
   useEffect(() => {
+    // That and below effect are quite similar, so it'd be possible to share some logic.
+    const Limit = 100;
     const fetchData = async () => {
-      // TODO because campaigns are big set of data instead of loading that directly into
-      // memory it could be already transformed into chart data by chunks.
-      const campaigns = await fetchAll(fetchCampaigns, 1000);
-      const dataSource = await fetchAll(fetchDataSource);
-      setDataSourcesOptions(dataSource.items.map(convertDataSourceToSelect));
-      setCampaignData(campaigns.items);
+      let currentPage = 0;
+      let dataSource = await fetchDataSource({
+        offset: currentPage,
+        limit: Limit,
+      });
+      let dataSourceData: SelectOption[] = [];
+      do {
+        dataSourceData = [
+          ...dataSourceData,
+          ...dataSource.results.map(convertDataSourceToSelect),
+        ];
+        currentPage += 1;
+        dataSource = await fetchDataSource({ offset: currentPage * Limit });
+      } while (dataSource.next);
+      setDataSourcesOptions(dataSourceData);
     };
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const filteredFetchCampaigns = (pagination: BasePaginationFilters) =>
+      fetchCampaigns({
+        ...pagination,
+        ...campaignFilters,
+      });
+
+    const fetchData = async () => {
+      setChartDataLoading(true);
+      const Limit = 1000;
+      let campaignsAggregated = {};
+      let currentPage = 0;
+      let campaignsResult = await filteredFetchCampaigns({
+        offset: currentPage * Limit,
+        limit: Limit,
+      });
+      do {
+        campaignsAggregated = aggregateCampaignItems(
+          campaignsResult.results,
+          campaignsAggregated
+        );
+        setChartData(
+          convertCampaignItemsToChartData(campaignsAggregated).sort((a, b) => {
+            return new Date(a.date).getTime() - new Date(b.date).getTime();
+          })
+        );
+        currentPage += 1;
+        campaignsResult = await filteredFetchCampaigns({
+          offset: currentPage * Limit,
+          limit: Limit,
+        });
+      } while (campaignsResult.next);
+      setChartDataLoading(false);
+    };
+
+    fetchData();
+  }, [campaignFilters]);
 
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -54,19 +105,13 @@ export const AdvertisingData = () => {
   }, [campaignSearchTerm]);
 
   const onFiltersApply = async (filters: FiltersType) => {
-    const campaigns = await fetchAll((pagination) =>
-      fetchCampaigns({
-        ...pagination,
-        campaign_ids: filters.campaigns.join(','),
-        data_sources_ids: filters.dataSources.join(','),
-      })
-    );
-    setCampaignData(campaigns.items);
-  };
+    const { dataSources = [], campaigns = [] } = filters;
 
-  const chartData = useMemo(() => {
-    return convertCampaignItemsToChartData(campaignData);
-  }, [campaignData]);
+    setCampaignFilters({
+      data_sources_ids: dataSources.join(','),
+      campaign_ids: campaigns.join(','),
+    });
+  };
 
   return (
     <Card className={styles.AdvertisingData_container}>
@@ -76,38 +121,49 @@ export const AdvertisingData = () => {
           campaigns={campaignDataOptions}
           dataSourcesOptions={dataSourcesOptions}
           onCampaignSearch={setCampaignSearchTerm}
+          // TODO improvement is to cancel current fetching
+          disableApply={chardDataLoading}
         />
       </div>
       <div className={styles.AdvertisingData_chart}>
+        {chardDataLoading && <div>Data is still loading...</div>}
         <DataChart data={chartData} />
       </div>
     </Card>
   );
 };
 
-function convertCampaignItemsToChartData(
-  items: CampaignItemAPI[]
-): DataChartItem[] {
-  const sum = items.reduce<
-    Record<string, Pick<CampaignItemAPI, 'impressions' | 'clicks'>>
-  >((accumulator, item) => {
+type CampaignAggregated = Record<
+  string,
+  Pick<CampaignItemAPI, 'impressions' | 'clicks' | 'date'>
+>;
+
+function aggregateCampaignItems(
+  items: CampaignItemAPI[],
+  initialValue: CampaignAggregated
+): CampaignAggregated {
+  return items.reduce<CampaignAggregated>((accumulator, item) => {
     const dateRecord = accumulator[item.date];
     if (dateRecord === undefined) {
       accumulator[item.date] = {
         impressions: item.impressions || 0,
         clicks: item.clicks || 0,
+        date: item.date,
       };
     } else {
       accumulator[item.date] = {
         impressions: dateRecord.impressions + item.impressions,
         clicks: dateRecord.clicks + item.clicks,
+        date: item.date,
       };
     }
 
     return accumulator;
-  }, {});
+  }, initialValue);
+}
 
-  return Object.entries(sum).map((entry) => {
+function convertCampaignItemsToChartData(aggregated: CampaignAggregated) {
+  return Object.entries(aggregated).map((entry) => {
     return {
       name: entry[0],
       ...entry[1],
