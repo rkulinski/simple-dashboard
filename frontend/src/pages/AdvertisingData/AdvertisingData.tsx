@@ -48,7 +48,7 @@ export const AdvertisingData = () => {
     // challenging.
 
     const campaigns = await fetchAll((pagination) =>
-      fetchCampaigns( {
+      fetchCampaigns({
         ...pagination,
         campaign_ids: filters.campaigns.join(','),
         data_sources_ids: filters.dataSources.join(','),
