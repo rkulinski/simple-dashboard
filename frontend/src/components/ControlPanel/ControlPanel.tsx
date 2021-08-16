@@ -16,12 +16,14 @@ export interface FiltersType {
 
 interface ControlPanelProps {
   onFiltersApply(filters: FiltersType): void;
+  onCampaignSearch(query: string): void;
   campaigns: SelectOption[];
   dataSourcesOptions: SelectOption[];
 }
 
 export const ControlPanel = (props: ControlPanelProps) => {
-  const { onFiltersApply, campaigns, dataSourcesOptions } = props;
+  const { onFiltersApply, campaigns, dataSourcesOptions, onCampaignSearch } =
+    props;
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
   const [selectedDataSource, setSelectedDataSource] = useState<string[]>([]);
 
@@ -31,6 +33,15 @@ export const ControlPanel = (props: ControlPanelProps) => {
     values: SelectOption[]
   ) => {
     setSelectedCampaigns(values.map((campaign) => campaign.value));
+  };
+
+  const onCampaignInputChange = (
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    event: React.ChangeEvent<{}>,
+    value: string
+  ) => {
+    // TODO add debounce + loading state for dropdown or replace with lazy loaded dropdown.
+    onCampaignSearch(value);
   };
 
   const onDataSourceChange = (
@@ -74,12 +85,13 @@ export const ControlPanel = (props: ControlPanelProps) => {
         options={campaigns}
         getOptionLabel={(option: SelectOption) => option.label}
         onChange={onCampaignChange}
+        onInputChange={onCampaignInputChange}
         renderInput={(params) => (
           <TextField
             {...params}
             variant="standard"
             label="Campaigns"
-            placeholder="All"
+            placeholder="Type to search for more..."
           />
         )}
       />

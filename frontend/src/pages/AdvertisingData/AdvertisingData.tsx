@@ -26,6 +26,7 @@ export const AdvertisingData = () => {
   const [dataSourcesOptions, setDataSourcesOptions] = useState<SelectOption[]>(
     []
   );
+  const [campaignSearchTerm, setCampaignSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,19 +35,25 @@ export const AdvertisingData = () => {
       const campaigns = await fetchAll(fetchCampaigns, 1000);
       const dataSource = await fetchAll(fetchDataSource);
       setDataSourcesOptions(dataSource.items.map(convertDataSourceToSelect));
-      setCampaignDataOptions(campaigns.items.map(convertCampaignToSelect));
       setCampaignData(campaigns.items);
     };
 
     fetchData();
   }, []);
 
-  const onFiltersApply = async (filters: FiltersType) => {
-    // It would depend on business decision weather it is allowed to operate on
-    // already fetched data or with apply it should be refetched.
-    // For purpose of this task I decided to use BE filtering to make it more
-    // challenging.
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      const campaigns = await fetchFlatCampaigns({
+        name: campaignSearchTerm,
+      });
 
+      setCampaignDataOptions(campaigns.results.map(convertCampaignToSelect));
+    };
+
+    fetchCampaigns();
+  }, [campaignSearchTerm]);
+
+  const onFiltersApply = async (filters: FiltersType) => {
     const campaigns = await fetchAll((pagination) =>
       fetchCampaigns({
         ...pagination,
@@ -68,6 +75,7 @@ export const AdvertisingData = () => {
           onFiltersApply={onFiltersApply}
           campaigns={campaignDataOptions}
           dataSourcesOptions={dataSourcesOptions}
+          onCampaignSearch={setCampaignSearchTerm}
         />
       </div>
       <div className={styles.AdvertisingData_chart}>
@@ -128,6 +136,22 @@ function fetchCampaigns(queryParams: DataFilter) {
     endpoint: CAMPAIGNS_API_URL,
     queryParams,
   });
+}
+
+function fetchFlatCampaigns(
+  queryParams: Pick<DataFilter, 'campaign_ids'> & { name: string }
+) {
+  // TODO this could be used with some input which would accept lazy loading.
+  return fetcher<CampaignItemAPI, DataFilter & { flat: boolean; name: string }>(
+    {
+      endpoint: CAMPAIGNS_API_URL,
+      queryParams: {
+        ...queryParams,
+        flat: true,
+        limit: 20,
+      },
+    }
+  );
 }
 
 function fetchDataSource(queryParams: DataFilter) {
